@@ -26,11 +26,15 @@ def sample_data(extra_modes=None, mouse=None):
     return {'modes': modes, 'mouse': mouse or []}
 
 
+def strip_all_ansi(handler, lines):
+    return '\n'.join(handler._strip_ansi(x) for x in lines)
+
+
 class TestShowKeys(BaseTest):
 
     def test_collect_keys_data(self):
-        from kitty.actions import groups
         from kittens.show_keys.main import collect_keys_data
+        from kitty.actions import groups
         opts = self.set_options()
         data = collect_keys_data(opts)
         self.assertIn('modes', data)
@@ -60,8 +64,8 @@ class TestShowKeys(BaseTest):
             self.assertIn('action', b)
 
     def test_collect_keys_categories_ordered(self):
-        from kitty.actions import groups
         from kittens.show_keys.main import collect_keys_data
+        from kitty.actions import groups
         opts = self.set_options()
         data = collect_keys_data(opts)
         default_mode = data['modes']['']
@@ -90,7 +94,7 @@ class TestShowKeys(BaseTest):
         lines = handler.display_lines
         self.assertTrue(len(lines) > 0)
         # Should contain the title
-        raw = '\n'.join(handler._strip_ansi(l) for l in lines)
+        raw = strip_all_ansi(handler, lines)
         self.assertIn('Kitty Keyboard Shortcuts', raw)
         # Should contain category headers
         self.assertIn('Copy/paste', raw)
@@ -110,7 +114,7 @@ class TestShowKeys(BaseTest):
         data = sample_data(mouse=mouse)
         handler = ShowKeys(data)
         handler._build_display_lines()
-        raw = '\n'.join(handler._strip_ansi(l) for l in handler.display_lines)
+        raw = strip_all_ansi(handler, handler.display_lines)
         self.assertIn('Mouse actions', raw)
         self.assertIn('mouse_selection normal', raw)
 
@@ -127,7 +131,7 @@ class TestShowKeys(BaseTest):
         data = sample_data(extra_modes=extra)
         handler = ShowKeys(data)
         handler._build_display_lines()
-        raw = '\n'.join(handler._strip_ansi(l) for l in handler.display_lines)
+        raw = strip_all_ansi(handler, handler.display_lines)
         self.assertIn('vim', raw)
         self.assertIn('move_left', raw)
 
@@ -143,7 +147,7 @@ class TestShowKeys(BaseTest):
         handler._apply_filter()
         self.assertTrue(len(handler.filtered_lines) < total)
         # Filtered lines should contain matching bindings
-        raw = '\n'.join(handler._strip_ansi(l) for l in handler.filtered_lines)
+        raw = strip_all_ansi(handler, handler.filtered_lines)
         self.assertIn('clipboard', raw.lower())
 
         # Filter for nonsense should show only structural lines

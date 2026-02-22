@@ -256,7 +256,7 @@ def _collect_keys_data() -> dict[str, Any]:
 def collect_keys_data(opts: Any) -> dict[str, Any]:
     """Collect all keybinding data from options into a JSON-serializable dict."""
     from kitty.actions import get_all_actions, groups
-    from kitty.options.utils import KeyDefinition, KeyboardMode
+    from kitty.options.utils import KeyDefinition
     from kitty.types import Shortcut
 
     # Build action->group lookup
